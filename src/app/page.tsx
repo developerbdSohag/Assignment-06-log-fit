@@ -38,26 +38,34 @@ export default function Home() {
     <div className="min-h-screen bg-[#09090b] text-white selection:bg-[#ccff00] selection:text-black px-6 md:px-12 py-12">
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#121215] to-[#18181b] border border-gray-800/80 p-8 md:p-12 mb-12 shadow-2xl">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#ccff00]/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="relative z-10 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/20 text-[#ccff00] text-xs font-extrabold uppercase tracking-widest mb-4">
-              <Dumbbell className="h-3.5 w-3.5" />
-              <span>Elite Training Library</span>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight mb-4">
-              Train with <span className="text-[#ccff00]">Intent</span>
+        <div className="relative rounded-3xl overflow-hidden bg-[#121215] border border-gray-800/80 p-8 md:p-12 mb-12 shadow-2xl flex flex-col md:flex-row items-center justify-between">
+          <div className="relative z-10 max-w-xl">
+            <p className="text-[#ccff00] text-xs font-extrabold uppercase tracking-widest mb-3">
+              Workout Library
+            </p>
+            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight mb-4 leading-none">
+              Train with intent. Log every set.
             </h1>
             <p className="text-gray-400 text-sm md:text-base mb-8 leading-relaxed">
-              Discover professional-grade gym routines, track your daily schedule, and build your ultimate workout program.
+              FitLog is a dark, no-nonsense gym companion: pick a lift, lock it into today&apos;s plan, and watch the week&apos;s work add up.
             </p>
             <Link
               href="/my-plan"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#ccff00] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl hover:bg-[#b3e600] transition-all shadow-lg shadow-[#ccff00]/20"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[#ccff00] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl hover:bg-[#b3e600] transition-all shadow-lg shadow-[#ccff00]/20"
             >
-              View My Plan & Saved Workouts
+              Browse Workouts
             </Link>
           </div>
+
+          {/* Hero 3D Illustration / Image */}
+          <div className="mt-8 md:mt-0 relative w-full md:w-96 h-72 flex items-center justify-center">
+            <img
+              src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=600"
+              alt="Gym Training"
+              className="w-full h-full object-cover rounded-2xl opacity-80 border border-gray-800 shadow-2xl"
+            />
+          </div>
+        </div>
         </div>
 
         {/* Search & Filters */}

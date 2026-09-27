@@ -2,58 +2,49 @@
 
 import Link from "next/link";
 import { useFitLog } from "@/context/FitLogContext";
-import { Dumbbell, Calendar, Bookmark, Home } from "lucide-react";
+import { Dumbbell } from "lucide-react";
 
 export default function Navbar() {
   const { plannedWorkouts = [], savedWorkouts = [] } = useFitLog() as any;
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#09090b]/80 backdrop-blur-md border-b border-gray-800/80 px-6 md:px-12 py-4">
+    <header className="sticky top-0 z-50 w-full bg-[#09090b] border-b border-gray-800/80 px-6 md:px-12 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl bg-[#ccff00]/10 border border-[#ccff00]/20 flex items-center justify-center text-[#ccff00] group-hover:bg-[#ccff00] group-hover:text-black transition-all">
-            <Dumbbell className="h-5 w-5" />
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-[#ccff00] flex items-center justify-center text-black">
+            <Dumbbell className="h-4 w-4" />
           </div>
-          <span className="font-black text-lg uppercase tracking-wider text-white">
-            Fit<span className="text-[#ccff00]">Log</span>
+          <span className="font-black text-lg tracking-wider text-white">
+            FITLOG
           </span>
         </Link>
 
-        <nav className="flex items-center gap-3">
+        {/* Center Links */}
+        <div className="hidden md:flex items-center gap-6">
           <Link
             href="/"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#121215] border border-gray-800 text-gray-300 hover:text-white hover:border-gray-700 text-xs font-extrabold uppercase tracking-wider transition-all"
+            className="px-4 py-1.5 rounded-full bg-[#18181b] border border-gray-800 text-xs font-bold text-[#ccff00] transition-colors"
           >
-            <Home className="h-4 w-4 text-[#ccff00]" />
-            <span className="hidden sm:inline">Home</span>
+            Workouts
           </Link>
-
           <Link
             href="/my-plan"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#121215] border border-gray-800 text-gray-300 hover:text-white hover:border-gray-700 text-xs font-extrabold uppercase tracking-wider transition-all relative"
+            className="text-xs font-bold text-gray-400 hover:text-white transition-colors"
           >
-            <Calendar className="h-4 w-4 text-[#ccff00]" />
-            <span className="hidden sm:inline">Dashboard</span>
-            {plannedWorkouts.length > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-[#ccff00] text-black text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow">
-                {plannedWorkouts.length}
-              </span>
-            )}
+            My Plan
           </Link>
+        </div>
 
-          <Link
-            href="/my-plan"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#121215] border border-gray-800 text-gray-300 hover:text-white hover:border-gray-700 text-xs font-extrabold uppercase tracking-wider transition-all relative"
-          >
-            <Bookmark className="h-4 w-4 text-[#ccff00]" />
-            <span className="hidden sm:inline">Saved</span>
-            {savedWorkouts.length > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-[#ccff00] text-black text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow">
-                {savedWorkouts.length}
-              </span>
-            )}
+        {/* Right Badges */}
+        <div className="flex items-center gap-4 text-xs font-bold">
+          <Link href="/my-plan" className="text-gray-400 hover:text-white transition-colors">
+            Plan <span className="text-[#ccff00] ml-0.5">({plannedWorkouts.length})</span>
           </Link>
-        </nav>
+          <Link href="/my-plan" className="text-gray-400 hover:text-white transition-colors">
+            Saved <span className="text-gray-400 ml-0.5">({savedWorkouts.length})</span>
+          </Link>
+        </div>
       </div>
     </header>
   );
