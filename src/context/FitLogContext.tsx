@@ -1,13 +1,13 @@
 "use client";
+
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { Workout } from "@/types/fitlog";
 
 interface FitLogContextType {
-  plan: Workout[];
-  saved: Workout[];
-  addToPlan: (workout: Workout) => void;
+  plannedWorkouts: any[];
+  savedWorkouts: any[];
+  addToPlan: (workout: any) => void;
   removeFromPlan: (id: number) => void;
-  toggleSave: (workout: Workout) => void;
+  toggleSave: (workout: any) => void;
   removeSaved: (id: number) => void;
   isPlanned: (id: number) => boolean;
   isSaved: (id: number) => boolean;
@@ -15,66 +15,82 @@ interface FitLogContextType {
 
 const FitLogContext = createContext<FitLogContextType | undefined>(undefined);
 
-export function FitLogProvider({ children }: { children: React.ReactNode }) {
-  const [plan, setPlan] = useState<Workout[]>([]);
-  const [saved, setSaved] = useState<Workout[]>([]);
+export const FitLogProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [plannedWorkouts, setPlannedWorkouts] = useState<any[]>([]);
+  const [savedWorkouts, setSavedWorkouts] = useState<any[]>([]);
 
+  // Safely load from localStorage after mounting on the client
   useEffect(() => {
-    const savedPlan = localStorage.getItem("fitlog_plan");
-    const savedList = localStorage.getItem("fitlog_saved");
-    if (savedPlan) setPlan(JSON.parse(savedPlan));
-    if (savedList) setSaved(JSON.parse(savedList));
+    try {
+      const savedPlan = localStorage.getItem("fitlog_plan");
+      const savedFavs = localStorage.getItem("fitlog_saved");
+      if (savedPlan) setPlannedWorkouts(JSON.parse(savedPlan));
+      if (savedFavs) setSavedWorkouts(JSON.parse(savedFavs));
+    } catch (e) {
+      console.error("Failed to load from localStorage", e);
+    }
   }, []);
 
-  const saveToStorage = (newPlan: Workout[], newSaved: Workout[]) => {
-    setPlan(newPlan);
-    setSaved(newSaved);
-    localStorage.setItem("fitlog_plan", JSON.stringify(newPlan));
-    localStorage.setItem("fitlog_saved", JSON.stringify(newSaved));
-  };
+  // Save to localStorage whenever state changes
+  useEffect(() => {
+    try {
+      localStorage.setItem("fitlog_plan", JSON.stringify(plannedWorkouts));
+    } catch (e) {}
+  }, [plannedWorkouts]);
 
-  const addToPlan = (workout: Workout) => {
-    if (plan.some((item) => item.id === workout.id)) return;
-    if (plan.length >= 5) {
-      alert("Today's plan is capped at 5 lifts. Finish some, then add more!");
-      return;
+  useEffect(() => {
+    try {
+      localStorage.setItem("fitlog_saved", JSON.stringify(savedWorkouts));
+    } catch (e) {}
+  }, [savedWorkouts]);
+
+  const addToPlan = (workout: any) => {
+    if (!plannedWorkouts.some((w) => w.id === workout.id)) {
+      setPlannedWorkouts([...plannedWorkouts, workout]);
     }
-    const updated = [...plan, workout];
-    saveToStorage(updated, saved);
   };
 
   const removeFromPlan = (id: number) => {
-    const updated = plan.filter((item) => item.id !== id);
-    saveToStorage(updated, saved);
+    setPlannedWorkouts(plannedWorkouts.filter((w) => w.id !== id));
   };
 
-  const toggleSave = (workout: Workout) => {
-    let updatedSaved;
-    if (saved.some((item) => item.id === workout.id)) {
-      updatedSaved = saved.filter((item) => item.id !== workout.id);
+  const toggleSave = (workout: any) => {
+    if (savedWorkouts.some((w) => w.id === workout.id)) {
+      setSavedWorkouts(savedWorkouts.filter((w) => w.id !== workout.id));
     } else {
-      updatedSaved = [...saved, workout];
+      setSavedWorkouts([...savedWorkouts, workout]);
     }
-    saveToStorage(plan, updatedSaved);
   };
 
   const removeSaved = (id: number) => {
-    const updatedSaved = saved.filter((item) => item.id !== id);
-    saveToStorage(plan, updatedSaved);
+    setSavedWorkouts(savedWorkouts.filter((w) => w.id !== id));
   };
 
-  const isPlanned = (id: number) => plan.some((item) => item.id === id);
-  const isSaved = (id: number) => saved.some((item) => item.id === id);
+  const isPlanned = (id: number) => plannedWorkouts.some((w) => w.id === id);
+  const isSaved = (id: number) => savedWorkouts.some((w) => w.id === id);
 
   return (
-    <FitLogContext.Provider value={{ plan, saved, addToPlan, removeFromPlan, toggleSave, removeSaved, isPlanned, isSaved }}>
+    <FitLogContext.Provider
+      value={{
+        plannedWorkouts,
+        savedWorkouts,
+        addToPlan,
+        removeFromPlan,
+        toggleSave,
+        removeSaved,
+        isPlanned,
+        isSaved,
+      }}
+    >
       {children}
     </FitLogContext.Provider>
   );
-}
+};
 
-export function useFitLog() {
+export const useFitLog = () => {
   const context = useContext(FitLogContext);
-  if (!context) throw new Error("useFitLog must be used within a FitLogProvider");
+  if (!context) {
+    throw new Error("useFitLog must be used within a FitLogProvider");
+  }
   return context;
-}
+};
