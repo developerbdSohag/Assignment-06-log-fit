@@ -160,14 +160,14 @@ export default function MyPlanPage() {
                     View Details
                   </Link>
                   <button
-                    onClick={() => {
-                      if (activeTab === "plan") removeFromPlan(workout.id);
-                      else removeSaved(workout.id);
-                    }}
-                    className="bg-[#18181b] hover:bg-red-600/20 hover:border-red-500/50 border border-gray-800 text-gray-400 hover:text-red-400 p-3 rounded-xl transition-all cursor-pointer"
-                    title="Remove item"
-                  >
-                    <X className="h-4 w-4" />
+                      onClick={() => {
+                        if (activeTab === "plan") removeFromPlan(Number(workout.id));
+                        else removeSaved(Number(workout.id));
+                      }}
+                      className="bg-[#18181b] hover:bg-red-600/20 hover:border-red-500/50 border border-gray-800 p-2.5 rounded-xl transition-colors text-gray-400 hover:text-red-400 cursor-pointer"
+                      title="Remove item"
+                    >
+                      <X className="h-4 w-4" />
                   </button>
                 </div>
               </div>
