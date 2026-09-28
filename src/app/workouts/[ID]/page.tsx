@@ -4,18 +4,19 @@ import WorkoutDetailClient from "./WorkoutDetailClient";
 import { Dumbbell } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   return (MOCK_WORKOUTS || []).map((workout: any) => ({
-    id: workout.id.toString(),
+    id: String(workout.id),
   }));
 }
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+export default async function Page({ params }: { params: { id: string } | Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const id = resolvedParams?.id;
 
-  const workout = (MOCK_WORKOUTS as any[]).find((w) => w.id.toString() === id?.toString());
+  const workout = (MOCK_WORKOUTS as any[]).find((w) => String(w.id) === String(id));
 
   if (!workout) {
     return (
