@@ -5,14 +5,14 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { MOCK_WORKOUTS } from "@/data/workouts";
 import { useFitLog } from "@/context/FitLogContext";
-import { ArrowLeft, Plus, Check, Bookmark, Calendar, Dumbbell } from "lucide-react";
+import { ArrowLeft, Check, Bookmark, Calendar, Dumbbell } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default function WorkoutDetailPage() {
   const [mounted, setMounted] = useState(false);
   const params = useParams();
-  const rawId = params?.id;
+  const id = params?.id;
 
   const { addToPlan, toggleSave, isPlanned, isSaved } = useFitLog() as any;
 
@@ -30,15 +30,31 @@ export default function WorkoutDetailPage() {
 
   const workoutsList = MOCK_WORKOUTS as any[];
   
-  // Flexible lookup: matches by exact id, string conversion, or fallback index
-  const cleanId = String(rawId).trim();
-  const workout = 
-    workoutsList.find((w) => String(w.id).trim() === cleanId || Number(w.id) === Number(cleanId)) ||
-    workoutsList[Number(cleanId) - 1] ||
-    workoutsList[0];
+  // Precisely match the clicked workout ID
+  const workout = workoutsList.find(
+    (w) => String(w.id).trim() === String(id).trim()
+  );
 
-  const planned = isPlanned(workout?.id);
-  const saved = isSaved(workout?.id);
+  if (!workout) {
+    return (
+      <div className="min-h-screen bg-[#09090b] text-white flex flex-col items-center justify-center px-6 text-center">
+        <div className="w-16 h-16 bg-[#121215] border border-gray-800 rounded-2xl flex items-center justify-center text-[#ccff00] mb-4">
+          <Dumbbell className="h-8 w-8" />
+        </div>
+        <h1 className="text-3xl font-black uppercase tracking-tight mb-2">Workout Not Found</h1>
+        <p className="text-gray-400 text-xs mb-6">Could not find workout with ID: {String(id)}</p>
+        <Link
+          href="/"
+          className="px-6 py-3 bg-[#ccff00] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl hover:bg-[#b3e600] transition-all"
+        >
+          Back to Workouts
+        </Link>
+      </div>
+    );
+  }
+
+  const planned = isPlanned(workout.id);
+  const saved = isSaved(workout.id);
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white selection:bg-[#ccff00] selection:text-black px-6 md:px-12 py-12 flex flex-col justify-between">
@@ -52,9 +68,9 @@ export default function WorkoutDetailPage() {
           <span>Back to workouts</span>
         </Link>
 
-        {/* Main Details Grid Container matching reference design */}
+        {/* Main Details Grid Container */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Image Card */}
+          {/* Left Column: Unique Workout Image */}
           <div className="lg:col-span-5 bg-[#121215] border border-gray-800/80 rounded-3xl overflow-hidden shadow-2xl p-4">
             <div className="relative h-80 md:h-[420px] rounded-2xl overflow-hidden bg-gray-900">
               <img
@@ -65,13 +81,13 @@ export default function WorkoutDetailPage() {
             </div>
           </div>
 
-          {/* Right Column: Title, Categories, Specs Table, Instructions, Buttons */}
+          {/* Right Column: Title, Specs Table, Instructions */}
           <div className="lg:col-span-7 flex flex-col">
             <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-3 text-white">
               {workout.name}
             </h1>
             <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-              {workout.description || `A targeted compound or isolation movement utilizing ${workout.equipment || "professional gear"} for maximum strength and conditioning.`}
+              {workout.description || `A targeted workout utilizing ${workout.equipment || "professional gear"} for maximum strength and conditioning.`}
             </p>
 
             {/* Category Tags */}
@@ -99,7 +115,7 @@ export default function WorkoutDetailPage() {
               </div>
               <div className="grid grid-cols-2 px-6 py-4 border-b border-gray-800 text-xs">
                 <span className="text-gray-400 font-bold uppercase tracking-wider">Reps</span>
-                <span className="text-white font-bold text-right">{workout.reps || "6-8"}</span>
+                <span className="text-white font-bold text-right">{workout.reps || "8-12"}</span>
               </div>
               <div className="grid grid-cols-2 px-6 py-4 border-b border-gray-800 text-xs">
                 <span className="text-gray-400 font-bold uppercase tracking-wider">Duration</span>
@@ -127,9 +143,9 @@ export default function WorkoutDetailPage() {
                   ))
                 ) : (
                   <>
-                    <li>Position yourself correctly with proper stance and posture.</li>
-                    <li>Execute the movement smoothly with controlled eccentric and concentric phases.</li>
-                    <li>Maintain core engagement and steady breathing throughout the set.</li>
+                    <li>Maintain proper form and posture throughout the exercise.</li>
+                    <li>Perform smooth, controlled repetitions.</li>
+                    <li>Breathe steadily and focus on targeted muscle engagement.</li>
                   </>
                 )}
               </ol>
