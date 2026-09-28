@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useFitLog } from "@/context/FitLogContext";
-import { Clock, Flame, ArrowLeft, Plus, Check, Bookmark } from "lucide-react";
+import { ArrowLeft, Plus, Check, Bookmark, Calendar } from "lucide-react";
 
 export default function WorkoutDetailClient({ workout }: { workout: any }) {
   const [mounted, setMounted] = useState(false);
-  const { plannedWorkouts = [], addToPlan, toggleSave, isPlanned, isSaved } = useFitLog() as any;
+  const { addToPlan, toggleSave, isPlanned, isSaved } = useFitLog() as any;
 
   useEffect(() => {
     setMounted(true);
@@ -26,7 +26,7 @@ export default function WorkoutDetailClient({ workout }: { workout: any }) {
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white selection:bg-[#ccff00] selection:text-black px-6 md:px-12 py-12 flex flex-col justify-between">
-      <div className="max-w-4xl mx-auto w-full">
+      <div className="max-w-5xl mx-auto w-full">
         {/* Back Link */}
         <Link
           href="/"
@@ -36,92 +36,120 @@ export default function WorkoutDetailClient({ workout }: { workout: any }) {
           <span>Back to workouts</span>
         </Link>
 
-        {/* Workout Detail Card */}
-        <div className="bg-[#121215] border border-gray-800/80 rounded-3xl overflow-hidden shadow-2xl p-6 md:p-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="relative h-72 md:h-96 rounded-2xl overflow-hidden border border-gray-800">
+        {/* Main Details Grid Container matching reference design */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Image Card */}
+          <div className="lg:col-span-5 bg-[#121215] border border-gray-800/80 rounded-3xl overflow-hidden shadow-2xl p-4">
+            <div className="relative h-80 md:h-[420px] rounded-2xl overflow-hidden">
               <img
                 src={workout.image}
                 alt={workout.name}
                 className="w-full h-full object-cover"
               />
             </div>
+          </div>
 
-            <div className="flex flex-col justify-between h-full">
-              <div>
-                <div className="flex gap-2 mb-4">
-                  {workout.category?.map((cat: string, idx: number) => (
-                    <span key={idx} className="bg-[#ccff00] text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
-                      {cat}
-                    </span>
-                  ))}
-                </div>
+          {/* Right Column: Title, Categories, Specs Table, Instructions, Buttons */}
+          <div className="lg:col-span-7 flex flex-col">
+            <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-3 text-white">
+              {workout.name}
+            </h1>
+            <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+              {workout.description || `A targeted compound or isolation movement utilizing ${workout.equipment || "professional gear"} for maximum strength and conditioning.`}
+            </p>
 
-                <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-3 text-white">
-                  {workout.name}
-                </h1>
-                <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-                  {workout.description || `Targeted muscle training utilizing ${workout.equipment || "professional gym equipment"} for maximum efficiency and strength building.`}
-                </p>
+            {/* Category Tags */}
+            <div className="flex gap-2 mb-6">
+              {workout.category?.map((cat: string, idx: number) => (
+                <span key={idx} className="bg-[#ccff00] text-black text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider">
+                  {cat}
+                </span>
+              ))}
+            </div>
 
-                <div className="grid grid-cols-3 gap-4 py-4 border-y border-gray-800/80 mb-8 text-xs">
-                  <div>
-                    <p className="text-gray-500 uppercase font-bold mb-1">Duration</p>
-                    <p className="text-base font-black text-white flex items-center gap-1">
-                      <Clock className="h-4 w-4 text-[#ccff00]" /> {workout.duration} min
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 uppercase font-bold mb-1">Calories</p>
-                    <p className="text-base font-black text-white flex items-center gap-1">
-                      <Flame className="h-4 w-4 text-orange-400" /> {workout.calories} kcal
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 uppercase font-bold mb-1">Rating</p>
-                    <p className="text-base font-black text-white">⭐ {workout.rating || "4.8"}</p>
-                  </div>
-                </div>
+            {/* Specifications Table */}
+            <div className="bg-[#121215] border border-gray-800/80 rounded-2xl overflow-hidden mb-8 shadow-xl">
+              <div className="grid grid-cols-2 px-6 py-4 border-b border-gray-800 text-xs">
+                <span className="text-gray-400 font-bold uppercase tracking-wider">Equipment</span>
+                <span className="text-white font-bold text-right">{workout.equipment || "Standard Equipment"}</span>
               </div>
-
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => addToPlan(workout)}
-                  className={`flex-1 py-3.5 px-6 rounded-xl border text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-2 ${
-                    planned
-                      ? "bg-[#ccff00]/10 border-[#ccff00]/30 text-[#ccff00]"
-                      : "bg-[#ccff00] border-[#ccff00] text-black hover:bg-[#b3e600]"
-                  }`}
-                >
-                  {planned ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                  {planned ? "Added to Plan" : "Add to Today's Plan"}
-                </button>
-
-                <button
-                  onClick={() => toggleSave(workout)}
-                  className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
-                    saved
-                      ? "bg-[#ccff00] border-[#ccff00] text-black"
-                      : "bg-[#18181b] border-gray-800 text-white hover:border-gray-700"
-                  }`}
-                  title="Save Workout"
-                >
-                  <Bookmark className={`h-5 w-5 ${saved ? "fill-black" : ""}`} />
-                </button>
+              <div className="grid grid-cols-2 px-6 py-4 border-b border-gray-800 text-xs">
+                <span className="text-gray-400 font-bold uppercase tracking-wider">Difficulty</span>
+                <span className="text-white font-bold text-right">{workout.difficulty || "Intermediate"}</span>
               </div>
+              <div className="grid grid-cols-2 px-6 py-4 border-b border-gray-800 text-xs">
+                <span className="text-gray-400 font-bold uppercase tracking-wider">Sets</span>
+                <span className="text-white font-bold text-right">{workout.sets || "4"}</span>
+              </div>
+              <div className="grid grid-cols-2 px-6 py-4 border-b border-gray-800 text-xs">
+                <span className="text-gray-400 font-bold uppercase tracking-wider">Reps</span>
+                <span className="text-white font-bold text-right">{workout.reps || "6-8"}</span>
+              </div>
+              <div className="grid grid-cols-2 px-6 py-4 border-b border-gray-800 text-xs">
+                <span className="text-gray-400 font-bold uppercase tracking-wider">Duration</span>
+                <span className="text-white font-bold text-right">{workout.duration} min</span>
+              </div>
+              <div className="grid grid-cols-2 px-6 py-4 border-b border-gray-800 text-xs">
+                <span className="text-gray-400 font-bold uppercase tracking-wider">Calories</span>
+                <span className="text-white font-bold text-right">{workout.calories} kcal</span>
+              </div>
+              <div className="grid grid-cols-2 px-6 py-4 text-xs">
+                <span className="text-gray-400 font-bold uppercase tracking-wider">Rating</span>
+                <span className="text-white font-bold text-right">⭐ {workout.rating || "4.8"}</span>
+              </div>
+            </div>
+
+            {/* Instructions Section */}
+            <div className="mb-8">
+              <h3 className="text-xs font-extrabold uppercase tracking-widest text-gray-400 mb-3">
+                Instructions
+              </h3>
+              <ol className="space-y-2 text-xs text-gray-300 leading-relaxed list-decimal list-inside">
+                {workout.instructions && workout.instructions.length > 0 ? (
+                  workout.instructions.map((step: string, index: number) => (
+                    <li key={index} className="pl-1">{step}</li>
+                  ))
+                ) : (
+                  <>
+                    <li>Position yourself correctly with proper stance and posture.</li>
+                    <li>Execute the movement smoothly with controlled eccentric and concentric phases.</li>
+                    <li>Maintain core engagement and steady breathing throughout the set.</li>
+                  </>
+                )}
+              </ol>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => addToPlan(workout)}
+                className={`flex-1 py-4 px-6 rounded-xl border text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg ${
+                  planned
+                    ? "bg-[#ccff00]/10 border-[#ccff00]/30 text-[#ccff00]"
+                    : "bg-[#ccff00] border-[#ccff00] text-black hover:bg-[#b3e600] shadow-[#ccff00]/20"
+                }`}
+              >
+                {planned ? <Check className="h-4 w-4" /> : <Calendar className="h-4 w-4" />}
+                {planned ? "Added to Plan" : "Add to today's plan"}
+              </button>
+
+              <button
+                onClick={() => toggleSave(workout)}
+                className={`py-4 px-6 rounded-xl border text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
+                  saved
+                    ? "bg-[#ccff00] border-[#ccff00] text-black"
+                    : "bg-[#18181b] border-gray-800 text-white hover:border-gray-700"
+                }`}
+                title="Save for later"
+              >
+                <Bookmark className={`h-4 w-4 ${saved ? "fill-black" : ""}`} />
+                <span>Save for later</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="max-w-4xl mx-auto w-full border-t border-gray-800 mt-16 pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500">
-        <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="FitLog Logo" className="w-5 h-5 object-contain" />
-          <span className="font-black text-white tracking-widest">FITLOG</span>
-        </div>
-        <p>© 2026 FitLog — Workout Library. Train hard, log honest.</p>
-      </footer>
     </div>
   );
 }

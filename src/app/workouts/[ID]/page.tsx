@@ -12,17 +12,16 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const rawId = params?.id;
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const rawId = resolvedParams?.id;
 
-  // Extremely robust finder: checks strict ID, string ID, slug, or numeric index fallback
   const workoutsList = MOCK_WORKOUTS as any[];
-  const workout = 
-    workoutsList.find((w) => String(w.id) === String(rawId) || Number(w.id) === Number(rawId)) ||
-    workoutsList.find((w) => w.slug && String(w.slug).toLowerCase() === String(rawId).toLowerCase()) ||
-    workoutsList[Number(rawId) - 1] ||
-    workoutsList[0]; // Ultimate fallback so it never fails
+  
+  // Exact dynamic matching by ID (string or number)
+  const workout = workoutsList.find(
+    (w) => String(w.id) === String(rawId) || Number(w.id) === Number(rawId)
+  );
 
   if (!workout) {
     return (
