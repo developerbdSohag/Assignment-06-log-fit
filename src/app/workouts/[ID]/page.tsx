@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default function WorkoutDetailPage() {
   const [mounted, setMounted] = useState(false);
   const params = useParams();
-  const id = params?.id;
+  const rawId = params?.id;
 
   const { addToPlan, toggleSave, isPlanned, isSaved } = useFitLog() as any;
 
@@ -30,31 +30,15 @@ export default function WorkoutDetailPage() {
 
   const workoutsList = MOCK_WORKOUTS as any[];
   
-  // Find workout by matching id or fallback to index/slug
-  const workout = workoutsList.find(
-    (w) => String(w.id) === String(id) || Number(w.id) === Number(id)
-  ) || workoutsList[0];
+  // Flexible lookup: matches by exact id, string conversion, or fallback index
+  const cleanId = String(rawId).trim();
+  const workout = 
+    workoutsList.find((w) => String(w.id).trim() === cleanId || Number(w.id) === Number(cleanId)) ||
+    workoutsList[Number(cleanId) - 1] ||
+    workoutsList[0];
 
-  if (!workout) {
-    return (
-      <div className="min-h-screen bg-[#09090b] text-white flex flex-col items-center justify-center px-6 text-center">
-        <div className="w-16 h-16 bg-[#121215] border border-gray-800 rounded-2xl flex items-center justify-center text-[#ccff00] mb-4">
-          <Dumbbell className="h-8 w-8" />
-        </div>
-        <h1 className="text-3xl font-black uppercase tracking-tight mb-2">Workout Not Found</h1>
-        <p className="text-gray-400 text-xs mb-6">The workout you are looking for doesn't exist.</p>
-        <Link
-          href="/"
-          className="px-6 py-3 bg-[#ccff00] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl hover:bg-[#b3e600] transition-all"
-        >
-          Back to Workouts
-        </Link>
-      </div>
-    );
-  }
-
-  const planned = isPlanned(workout.id);
-  const saved = isSaved(workout.id);
+  const planned = isPlanned(workout?.id);
+  const saved = isSaved(workout?.id);
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white selection:bg-[#ccff00] selection:text-black px-6 md:px-12 py-12 flex flex-col justify-between">
@@ -72,7 +56,7 @@ export default function WorkoutDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Image Card */}
           <div className="lg:col-span-5 bg-[#121215] border border-gray-800/80 rounded-3xl overflow-hidden shadow-2xl p-4">
-            <div className="relative h-80 md:h-[420px] rounded-2xl overflow-hidden">
+            <div className="relative h-80 md:h-[420px] rounded-2xl overflow-hidden bg-gray-900">
               <img
                 src={workout.image}
                 alt={workout.name}
@@ -182,7 +166,14 @@ export default function WorkoutDetailPage() {
         </div>
       </div>
 
-
+      {/* Footer */}
+      <footer className="max-w-5xl mx-auto w-full border-t border-gray-800 mt-16 pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500">
+        <div className="flex items-center gap-2">
+          <img src="/logo.png" alt="FitLog Logo" className="w-5 h-5 object-contain" />
+          <span className="font-black text-white tracking-widest">FITLOG</span>
+        </div>
+        <p>© 2026 FitLog — Workout Library. Train hard, log honest.</p>
+      </footer>
     </div>
   );
 }
