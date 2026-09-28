@@ -16,7 +16,10 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const id = params?.id;
 
-  const workout = (MOCK_WORKOUTS as any[]).find((w) => String(w.id) === String(id));
+  // Flexible comparison to match both numbers and strings (e.g., id "1" matches workout.id 1)
+  const workout = (MOCK_WORKOUTS as any[]).find(
+    (w) => String(w.id) === String(id) || Number(w.id) === Number(id)
+  );
 
   if (!workout) {
     return (
