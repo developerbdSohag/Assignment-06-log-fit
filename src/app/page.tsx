@@ -4,14 +4,15 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { MOCK_WORKOUTS } from "@/data/workouts";
 import { useFitLog } from "@/context/FitLogContext";
-import { Search, Flame, Clock, Star, Plus, Check, Bookmark, Dumbbell } from "lucide-react";
+import { Search, Clock, Flame, Check, Plus, Bookmark } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const { addToPlan, toggleSave, isPlanned, isSaved } = useFitLog();
+  const { addToPlan, toggleSave, isPlanned, isSaved } = useFitLog() as any;
 
   useEffect(() => {
     setMounted(true);
@@ -25,14 +26,21 @@ export default function Home() {
     );
   }
 
-  const categories = ["All", "Strength", "Cardio", "HIIT", "Core"];
-
-  const filteredWorkouts = MOCK_WORKOUTS.filter((workout) => {
-    const matchesSearch = workout.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          workout.equipment.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "All" || workout.category?.includes(selectedCategory);
-    return matchesSearch && matchesCategory;
+  // Filter workouts by name or tags
+  const filteredWorkouts = (MOCK_WORKOUTS as any[]).filter((workout) => {
+    const query = searchQuery.toLowerCase();
+    const matchesName = workout.name.toLowerCase().includes(query);
+    const matchesTag = workout.category?.some((cat: string) => cat.toLowerCase().includes(query));
+    return matchesName || matchesTag;
   });
+
+  const scrollToLibrary = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const libraryElement = document.getElementById("library-section");
+    if (libraryElement) {
+      libraryElement.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white selection:bg-[#ccff00] selection:text-black px-6 md:px-12 py-12">
@@ -49,58 +57,50 @@ export default function Home() {
             <p className="text-gray-400 text-sm md:text-base mb-8 leading-relaxed">
               FitLog is a dark, no-nonsense gym companion: pick a lift, lock it into today&apos;s plan, and watch the week&apos;s work add up.
             </p>
-            <Link
-              href="/my-plan"
-              className="inline-flex items-center justify-center px-8 py-4 bg-[#ccff00] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl hover:bg-[#b3e600] transition-all shadow-lg shadow-[#ccff00]/20"
+            <a
+              href="#library-section"
+              onClick={scrollToLibrary}
+              className="inline-flex items-center justify-center px-8 py-4 bg-[#ccff00] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl hover:bg-[#b3e600] transition-all shadow-lg shadow-[#ccff00]/25 cursor-pointer"
             >
               Browse Workouts
-            </Link>
+            </a>
           </div>
 
-          {/* Hero 3D Illustration / Image */}
           <div className="mt-8 md:mt-0 relative w-full md:w-96 h-72 flex items-center justify-center">
             <img
-              src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=600"
+              src="/banner.png"
               alt="Gym Training"
-              className="w-full h-full object-cover rounded-2xl opacity-80 border border-gray-800 shadow-2xl"
+              className="w-full h-full object-contain rounded-2xl shadow-2xl"
             />
           </div>
         </div>
-        </div>
 
-        {/* Search & Filters */}
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-8">
-          <div className="relative w-full md:w-96">
+        {/* Section Header & Search Bar */}
+        <div id="library-section" className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 pt-4">
+          <div>
+            <h2 className="text-xl font-black uppercase tracking-wider text-white mb-1">
+              The Library
+            </h2>
+            <p className="text-gray-400 text-xs">
+              Twelve lifts covering every major muscle group.
+            </p>
+          </div>
+
+          <div className="relative w-full md:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search workouts or equipment..."
+              placeholder="Search by name or tag..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#121215] border border-gray-800 rounded-2xl pl-11 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#ccff00] transition-colors"
+              className="w-full bg-[#121215] border border-gray-800 rounded-xl pl-11 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#ccff00] transition-colors"
             />
-          </div>
-
-          <div className="flex flex-wrap gap-2 w-full md:w-auto">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer ${
-                  selectedCategory === cat
-                    ? "bg-[#ccff00] text-black shadow-lg shadow-[#ccff00]/20"
-                    : "bg-[#121215] border border-gray-800 text-gray-400 hover:text-white hover:border-gray-700"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
           </div>
         </div>
 
         {/* Workouts Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredWorkouts.map((workout) => {
+          {filteredWorkouts.map((workout: any) => {
             const planned = isPlanned(workout.id);
             const saved = isSaved(workout.id);
 
@@ -115,57 +115,56 @@ export default function Home() {
                     alt={workout.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute top-4 left-4 flex gap-2">
-                    {workout.category?.slice(0, 1).map((cat, idx) => (
-                      <span key={idx} className="bg-[#ccff00] text-black text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow">
+                </div>
+
+                <div className="p-6 flex flex-col flex-grow">
+                  <div className="flex gap-2 mb-3">
+                    {workout.category?.map((cat: string, idx: number) => (
+                      <span key={idx} className="bg-[#ccff00] text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
                         {cat}
                       </span>
                     ))}
                   </div>
-                </div>
 
-                <div className="p-6 flex flex-col flex-grow">
-                  <h3 className="text-xl font-black uppercase tracking-tight mb-2 group-hover:text-[#ccff00] transition-colors">
-                    {workout.name}
-                  </h3>
-                  <p className="text-gray-400 text-xs line-clamp-2 mb-6 leading-relaxed">
-                    {workout.description}
+                  <Link href={`/workouts/${workout.id}`}>
+                    <h3 className="text-xl font-black uppercase tracking-tight mb-1 group-hover:text-[#ccff00] transition-colors">
+                      {workout.name}
+                    </h3>
+                  </Link>
+                  <p className="text-gray-400 text-xs mb-6">
+                    {workout.equipment || workout.description}
                   </p>
 
-                  <div className="grid grid-cols-3 gap-2 py-3 border-y border-gray-800/80 mb-6 text-center text-xs">
-                    <div>
-                      <p className="text-gray-500 font-bold uppercase tracking-wider text-[10px] mb-0.5">Time</p>
-                      <p className="font-extrabold text-white flex items-center justify-center gap-1"><Clock className="h-3 w-3 text-[#ccff00]" /> {workout.duration}m</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 font-bold uppercase tracking-wider text-[10px] mb-0.5">Burn</p>
-                      <p className="font-extrabold text-white flex items-center justify-center gap-1"><Flame className="h-3 w-3 text-orange-400" /> {workout.calories}k</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 font-bold uppercase tracking-wider text-[10px] mb-0.5">Level</p>
-                      <p className="font-extrabold text-[#ccff00]">{workout.difficulty}</p>
-                    </div>
+                  <div className="flex items-center justify-between text-xs text-gray-400 pt-4 border-t border-gray-800/80 mt-auto mb-4">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3.5 w-3.5" /> {workout.duration} min
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Flame className="h-3.5 w-3.5 text-orange-400" /> {workout.calories} kcal
+                    </span>
+                    <span className="flex items-center gap-1">
+                      ⭐ {workout.rating || "4.8"}
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-3 mt-auto">
+                  <div className="flex items-center gap-3">
                     <Link
                       href={`/workouts/${workout.id}`}
                       className="flex-1 bg-[#18181b] border border-gray-800 text-white font-extrabold text-xs uppercase tracking-wider py-3 rounded-xl hover:bg-gray-800 text-center transition-colors"
                     >
-                      Details
+                      DETAILS
                     </Link>
 
                     <button
                       onClick={() => addToPlan(workout)}
-                      disabled={planned}
-                      className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                      className={`px-5 py-3 rounded-xl border text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                         planned
-                          ? "bg-[#18181b] border-gray-800 text-[#ccff00] cursor-not-allowed"
+                          ? "bg-[#ccff00]/10 border-[#ccff00]/30 text-[#ccff00]"
                           : "bg-[#ccff00] border-[#ccff00] text-black hover:bg-[#b3e600]"
                       }`}
-                      title="Add to Plan"
                     >
                       {planned ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                      {planned ? "ADDED" : "+ ADD"}
                     </button>
 
                     <button

@@ -19,7 +19,7 @@ export const FitLogProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [plannedWorkouts, setPlannedWorkouts] = useState<any[]>([]);
   const [savedWorkouts, setSavedWorkouts] = useState<any[]>([]);
 
-  // Safely load from localStorage after mounting on the client
+  // Load from localStorage on mount
   useEffect(() => {
     try {
       const savedPlan = localStorage.getItem("fitlog_plan");
@@ -31,7 +31,7 @@ export const FitLogProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, []);
 
-  // Save to localStorage whenever state changes
+  // Save to localStorage on state changes
   useEffect(() => {
     try {
       localStorage.setItem("fitlog_plan", JSON.stringify(plannedWorkouts));
@@ -45,9 +45,16 @@ export const FitLogProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [savedWorkouts]);
 
   const addToPlan = (workout: any) => {
-    if (!plannedWorkouts.some((w) => w.id === workout.id)) {
-      setPlannedWorkouts([...plannedWorkouts, workout]);
+    // Check if already planned
+    if (plannedWorkouts.some((w) => w.id === workout.id)) return;
+
+    // Enforce strict maximum cap of 5 workouts and alert user if exceeded
+    if (plannedWorkouts.length >= 5) {
+      alert("Cap of five lifts for today reached. Finish them, then load more.");
+      return;
     }
+
+    setPlannedWorkouts([...plannedWorkouts, workout]);
   };
 
   const removeFromPlan = (id: number) => {
