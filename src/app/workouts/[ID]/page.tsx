@@ -12,9 +12,9 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function Page({ params }: { params: { id: string } | Promise<{ id: string }> }) {
-  const resolvedParams = await params;
-  const id = resolvedParams?.id;
+export default async function Page(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
+  const id = params?.id;
 
   const workout = (MOCK_WORKOUTS as any[]).find((w) => String(w.id) === String(id));
 
