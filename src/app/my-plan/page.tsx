@@ -167,12 +167,12 @@ function MyPlanContent() {
               </div>
 
               <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-                <Link
-                  href={`/workouts/${workout.id}`}
-                  className="px-5 py-3 bg-[#18181b] border border-gray-800 hover:border-gray-600 rounded-xl font-extrabold text-xs uppercase tracking-wider text-white transition-colors text-center"
-                >
-                  View Details
-                </Link>
+              <Link
+                href={`/workouts/detail?id=${workout.id}`}
+                className="flex-1 bg-[#18181b] border border-gray-800 text-white font-extrabold text-xs uppercase tracking-wider py-3 rounded-xl hover:bg-gray-800 text-center transition-colors"
+              >
+                DETAILS
+              </Link>
                 <button
                   onClick={() => {
                     if (activeTab === "plan") removeFromPlan(workout.id);
