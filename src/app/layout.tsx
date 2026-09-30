@@ -28,7 +28,15 @@ export default function RootLayout({
           <main className="flex-grow">
             {children}
           </main>
-
+          
+          {/* Global Footer */}
+          <footer className="border-t border-gray-800/80 py-8 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500 bg-[#09090b]">
+            <div className="flex items-center gap-2.5 mb-4 md:mb-0">
+              <img src="/logo.png" alt="FitLog Logo" className="w-5 h-5 object-contain" />
+              <span className="font-black text-white tracking-widest text-sm">FITLOG</span>
+            </div>
+            <p>© 2026 FitLog — Workout Library. Train hard, log honest.</p>
+          </footer>
         </FitLogProvider>
       </body>
     </html>
