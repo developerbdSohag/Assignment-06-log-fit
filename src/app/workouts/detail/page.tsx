@@ -167,12 +167,14 @@ function WorkoutDetailContent() {
 
 export default function WorkoutDetailRoute() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#ccff00] border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
-      <WorkoutDetailContent />
-    </Suspense>
+    <div className="min-h-screen bg-[#09090b] px-6 md:px-12 py-8 flex flex-col justify-between">
+      <Suspense fallback={
+        <div className="min-h-[50vh] flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-[#ccff00] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }>
+        <WorkoutDetailContent />
+      </Suspense>
+    </div>
   );
 }
