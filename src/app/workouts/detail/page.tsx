@@ -22,7 +22,7 @@ function WorkoutDetailContent() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
+      <div className="min-h-[50vh] flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-[#ccff00] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -30,7 +30,7 @@ function WorkoutDetailContent() {
 
   const workoutsList = MOCK_WORKOUTS as any[];
   
-  // Find the exact workout matching the selected card's ID
+  // Find the exact workout matching the query parameter ID cleanly
   const workout = workoutsList.find(
     (w) => String(w.id) === String(id) || Number(w.id) === Number(id)
   ) || workoutsList[0];
@@ -39,7 +39,7 @@ function WorkoutDetailContent() {
   const saved = isSaved(workout?.id);
 
   return (
-    <div className="max-w-5xl mx-auto w-full">
+    <div className="max-w-5xl mx-auto w-full py-8">
       {/* Back Link */}
       <Link
         href="/"
@@ -62,7 +62,7 @@ function WorkoutDetailContent() {
           </div>
         </div>
 
-        {/* Right Column: Dynamic Title, Specs Table, and Instructions */}
+        {/* Right Column: Title, Specs Table, Instructions */}
         <div className="lg:col-span-7 flex flex-col">
           <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-3 text-white">
             {workout.name}
@@ -167,23 +167,12 @@ function WorkoutDetailContent() {
 
 export default function WorkoutDetailRoute() {
   return (
-    <div className="min-h-screen bg-[#09090b] text-white selection:bg-[#ccff00] selection:text-black px-6 md:px-12 py-12 flex flex-col justify-between">
-      <Suspense fallback={
-        <div className="min-h-[50vh] flex items-center justify-center">
-          <div className="w-8 h-8 border-4 border-[#ccff00] border-t-transparent rounded-full animate-spin" />
-        </div>
-      }>
-        <WorkoutDetailContent />
-      </Suspense>
-
-      {/* Footer */}
-      <footer className="max-w-5xl mx-auto w-full border-t border-gray-800 mt-16 pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500">
-        <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="FitLog Logo" className="w-5 h-5 object-contain" />
-          <span className="font-black text-white tracking-widest">FITLOG</span>
-        </div>
-        <p>© 2026 FitLog — Workout Library. Train hard, log honest.</p>
-      </footer>
-    </div>
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#ccff00] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <WorkoutDetailContent />
+    </Suspense>
   );
 }

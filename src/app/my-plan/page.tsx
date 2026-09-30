@@ -168,10 +168,10 @@ function MyPlanContent() {
 
               <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
               <Link
-                href={`/workouts/detail?id=${workout.id}`}
-                className="flex-1 bg-[#18181b] border border-gray-800 text-white font-extrabold text-xs uppercase tracking-wider py-3 rounded-xl hover:bg-gray-800 text-center transition-colors"
-              >
-                DETAILS
+                  href={`/workouts/detail?id=${workout.id}`}
+                  className="bg-[#18181b] border border-gray-800 text-white font-extrabold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:bg-gray-800 text-center transition-colors"
+                >
+                  Details
               </Link>
                 <button
                   onClick={() => {
