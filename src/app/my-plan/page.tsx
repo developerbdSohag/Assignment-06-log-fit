@@ -44,6 +44,8 @@ function MyPlanContent() {
       return (Number(b.duration) || 0) - (Number(a.duration) || 0);
     } else if (sortBy === "Calories") {
       return (Number(b.calories) || 0) - (Number(a.calories) || 0);
+    } else if (sortBy === "Rating") {
+      return (Number(b.rating) || 0) - (Number(a.rating) || 0);
     } else if (sortBy === "Name") {
       return a.name.localeCompare(b.name);
     }
@@ -119,6 +121,7 @@ function MyPlanContent() {
             >
               <option value="Duration">Duration</option>
               <option value="Calories">Calories</option>
+              <option value="Rating">Rating</option>
               <option value="Name">Name</option>
             </select>
             <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
@@ -148,15 +151,19 @@ function MyPlanContent() {
               className="bg-[#121215] border border-gray-800/80 rounded-2xl p-4 md:p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl hover:bg-[#18181b]/90 hover:border-gray-700 hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 ease-out"
             >
               <div className="flex items-center gap-4 w-full sm:w-auto">
-                <img
-                  src={workout.image}
-                  alt={workout.name}
-                  className="w-20 h-20 rounded-xl object-cover border border-gray-800"
-                />
+                <Link href={`/workouts/${workout.id}`} className="shrink-0">
+                  <img
+                    src={workout.image}
+                    alt={workout.name}
+                    className="w-20 h-20 rounded-xl object-cover border border-gray-800"
+                  />
+                </Link>
                 <div>
-                  <h3 className="text-lg font-black uppercase tracking-tight text-white mb-1">
-                    {workout.name}
-                  </h3>
+                  <Link href={`/workouts/${workout.id}`}>
+                    <h3 className="text-lg font-black uppercase tracking-tight text-white hover:text-[#ccff00] transition-colors mb-1">
+                      {workout.name}
+                    </h3>
+                  </Link>
                   <p className="text-xs text-gray-400 mb-2">{workout.equipment || workout.description}</p>
                   <div className="flex items-center gap-4 text-xs text-gray-400">
                     <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5 text-[#ccff00]" /> {workout.duration} min</span>
@@ -167,12 +174,12 @@ function MyPlanContent() {
               </div>
 
               <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-              <Link
-                  href={`/workouts/detail?id=${workout.id}`}
+                <Link
+                  href={`/workouts/${workout.id}`}
                   className="bg-[#18181b] border border-gray-800 text-white font-extrabold text-xs uppercase tracking-wider py-3 px-6 rounded-xl hover:bg-gray-800 text-center transition-colors"
                 >
                   Details
-              </Link>
+                </Link>
                 <button
                   onClick={() => {
                     if (activeTab === "plan") removeFromPlan(workout.id);

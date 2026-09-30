@@ -109,13 +109,13 @@ export default function Home() {
                 key={workout.id}
                 className="bg-[#121215] border border-gray-800/80 rounded-3xl overflow-hidden shadow-xl flex flex-col group hover:border-gray-700 transition-all duration-300"
               >
-                <div className="relative h-52 overflow-hidden bg-gray-900">
+                <Link href={`/workouts/${workout.id}`} className="relative h-52 overflow-hidden bg-gray-900 block">
                   <img
                     src={workout.image}
                     alt={workout.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                </div>
+                </Link>
 
                 <div className="p-6 flex flex-col flex-grow">
                   <div className="flex gap-2 mb-3">
