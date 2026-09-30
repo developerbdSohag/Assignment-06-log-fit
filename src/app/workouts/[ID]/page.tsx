@@ -58,7 +58,7 @@ export default function WorkoutDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white selection:bg-[#ccff00] selection:text-black px-6 md:px-12 py-12 flex flex-col justify-between">
-      <div className="max-w-5xl mx-auto w-full">
+      <div className="max-w-5xl mx-auto w-full pb-12">
         {/* Back Link */}
         <Link
           href="/"
