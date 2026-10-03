@@ -3,14 +3,17 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { MOCK_WORKOUTS } from "@/data/workouts";
+import { fetchWorkoutById } from "@/services/api";
+import { Workout } from "@/types/fitlog";
 import { useFitLog } from "@/context/FitLogContext";
 import { ArrowLeft, Check, Bookmark, Calendar, Dumbbell } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default function WorkoutDetailPage() {
-  const [mounted, setMounted] = useState(false);
+  const [workout, setWorkout] = useState<Workout | null>(null);
+  const [loading, setLoading] = useState(true);
+
   const params = useParams();
   const rawId = params?.id ?? params?.ID;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
@@ -18,23 +21,39 @@ export default function WorkoutDetailPage() {
   const { addToPlan, toggleSave, isPlanned, isSaved } = useFitLog() as any;
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    let isMounted = true;
+    async function loadWorkout() {
+      if (!id) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const data = await fetchWorkoutById(id);
+        if (isMounted) {
+          setWorkout(data);
+        }
+      } catch (err) {
+        console.error("Failed to load workout details from API:", err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+    loadWorkout();
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
 
-  if (!mounted) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#ccff00] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center gap-4">
+        <div className="w-10 h-10 border-4 border-[#ccff00] border-t-transparent rounded-full animate-spin" />
+        <p className="text-gray-400 text-xs font-bold tracking-wider uppercase">Loading workout details...</p>
       </div>
     );
   }
-
-  const workoutsList = MOCK_WORKOUTS as any[];
-
-  // Precisely match the clicked workout ID
-  const workout = workoutsList.find(
-    (w) => String(w.id).trim() === String(id).trim()
-  );
 
   if (!workout) {
     return (
@@ -54,8 +73,10 @@ export default function WorkoutDetailPage() {
     );
   }
 
-  const planned = isPlanned(workout.id);
-  const saved = isSaved(workout.id);
+  const planned = isPlanned(Number(workout.id));
+  const saved = isSaved(Number(workout.id));
+  const tags = workout.muscleGroups || workout.category || [];
+  const calories = workout.caloriesBurned ?? workout.calories ?? 0;
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white selection:bg-[#ccff00] selection:text-black px-6 md:px-12 py-12 flex flex-col justify-between">
@@ -92,8 +113,8 @@ export default function WorkoutDetailPage() {
             </p>
 
             {/* Category Tags */}
-            <div className="flex gap-2 mb-6">
-              {workout.category?.map((cat: string, idx: number) => (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {tags.map((cat: string, idx: number) => (
                 <span key={idx} className="bg-[#ccff00] text-black text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider">
                   {cat}
                 </span>
@@ -124,7 +145,7 @@ export default function WorkoutDetailPage() {
               </div>
               <div className="grid grid-cols-2 px-6 py-4 border-b border-gray-800 text-xs">
                 <span className="text-gray-400 font-bold uppercase tracking-wider">Calories</span>
-                <span className="text-white font-bold text-right">{workout.calories} kcal</span>
+                <span className="text-white font-bold text-right">{calories} kcal</span>
               </div>
               <div className="grid grid-cols-2 px-6 py-4 text-xs">
                 <span className="text-gray-400 font-bold uppercase tracking-wider">Rating</span>

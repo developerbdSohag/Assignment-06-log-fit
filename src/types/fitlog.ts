@@ -1,10 +1,12 @@
 export interface Workout {
   id: number | string;
   name: string;
-  category: string[];
+  category?: string[];
+  muscleGroups?: string[];
   equipment: string;
   duration: number; // in minutes
-  calories: number;
+  calories?: number;
+  caloriesBurned?: number;
   rating: number;
   difficulty?: string;
   sets?: number;

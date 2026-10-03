@@ -2,35 +2,57 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { MOCK_WORKOUTS } from "@/data/workouts";
+import { fetchWorkouts } from "@/services/api";
+import { Workout } from "@/types/fitlog";
 import { useFitLog } from "@/context/FitLogContext";
 import { Search, Clock, Flame, Check, Plus, Bookmark } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false);
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
   const { addToPlan, toggleSave, isPlanned, isSaved } = useFitLog() as any;
 
   useEffect(() => {
-    setMounted(true);
+    let isMounted = true;
+    async function loadData() {
+      try {
+        const data = await fetchWorkouts();
+        if (isMounted) {
+          setWorkouts(data);
+        }
+      } catch (err) {
+        console.error("Failed to load workouts:", err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+    loadData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  if (!mounted) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#ccff00] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#09090b] flex flex-col items-center justify-center gap-4">
+        <div className="w-10 h-10 border-4 border-[#ccff00] border-t-transparent rounded-full animate-spin" />
+        <p className="text-gray-400 text-xs font-bold tracking-wider uppercase">Loading workouts...</p>
       </div>
     );
   }
 
   // Filter workouts by name or tags
-  const filteredWorkouts = (MOCK_WORKOUTS as any[]).filter((workout) => {
+  const filteredWorkouts = workouts.filter((workout) => {
     const query = searchQuery.toLowerCase();
     const matchesName = workout.name.toLowerCase().includes(query);
-    const matchesTag = workout.category?.some((cat: string) => cat.toLowerCase().includes(query));
+    const tags = workout.muscleGroups || workout.category || [];
+    const matchesTag = tags.some((cat: string) => cat.toLowerCase().includes(query));
     return matchesName || matchesTag;
   });
 
@@ -100,9 +122,11 @@ export default function Home() {
 
         {/* Workouts Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredWorkouts.map((workout: any) => {
-            const planned = isPlanned(workout.id);
-            const saved = isSaved(workout.id);
+          {filteredWorkouts.map((workout: Workout) => {
+            const planned = isPlanned(Number(workout.id));
+            const saved = isSaved(Number(workout.id));
+            const tags = workout.muscleGroups || workout.category || [];
+            const calories = workout.caloriesBurned ?? workout.calories ?? 0;
 
             return (
               <div
@@ -118,8 +142,8 @@ export default function Home() {
                 </Link>
 
                 <div className="p-6 flex flex-col flex-grow">
-                  <div className="flex gap-2 mb-3">
-                    {workout.category?.map((cat: string, idx: number) => (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {tags.map((cat: string, idx: number) => (
                       <span key={idx} className="bg-[#ccff00] text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
                         {cat}
                       </span>
@@ -140,7 +164,7 @@ export default function Home() {
                       <Clock className="h-3.5 w-3.5" /> {workout.duration} min
                     </span>
                     <span className="flex items-center gap-1">
-                      <Flame className="h-3.5 w-3.5 text-orange-400" /> {workout.calories} kcal
+                      <Flame className="h-3.5 w-3.5 text-orange-400" /> {calories} kcal
                     </span>
                     <span className="flex items-center gap-1">
                       ⭐ {workout.rating || "4.8"}
@@ -148,12 +172,12 @@ export default function Home() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                  <Link
-                    href={`/workouts/${workout.id}`}
-                    className="flex-1 bg-[#18181b] border border-gray-800 text-white font-extrabold text-xs uppercase tracking-wider py-3 rounded-xl hover:bg-gray-800 text-center transition-colors"
-                  >
-                    Details
-                  </Link>
+                    <Link
+                      href={`/workouts/${workout.id}`}
+                      className="flex-1 bg-[#18181b] border border-gray-800 text-white font-extrabold text-xs uppercase tracking-wider py-3 rounded-xl hover:bg-gray-800 text-center transition-colors"
+                    >
+                      Details
+                    </Link>
 
                     <button
                       onClick={() => addToPlan(workout)}

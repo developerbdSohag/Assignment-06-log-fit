@@ -43,7 +43,7 @@ function MyPlanContent() {
     if (sortBy === "Duration") {
       return (Number(b.duration) || 0) - (Number(a.duration) || 0);
     } else if (sortBy === "Calories") {
-      return (Number(b.calories) || 0) - (Number(a.calories) || 0);
+      return (Number(b.caloriesBurned ?? b.calories) || 0) - (Number(a.caloriesBurned ?? a.calories) || 0);
     } else if (sortBy === "Rating") {
       return (Number(b.rating) || 0) - (Number(a.rating) || 0);
     } else if (sortBy === "Name") {
@@ -54,7 +54,7 @@ function MyPlanContent() {
 
   const totalExercises = currentList.length;
   const totalMinutes = currentList.reduce((acc: number, curr: any) => acc + (Number(curr.duration) || 0), 0);
-  const totalCalories = currentList.reduce((acc: number, curr: any) => acc + (Number(curr.calories) || 0), 0);
+  const totalCalories = currentList.reduce((acc: number, curr: any) => acc + (Number(curr.caloriesBurned ?? curr.calories) || 0), 0);
 
   return (
     <div className="max-w-6xl mx-auto w-full">
@@ -167,7 +167,7 @@ function MyPlanContent() {
                   <p className="text-xs text-gray-400 mb-2">{workout.equipment || workout.description}</p>
                   <div className="flex items-center gap-4 text-xs text-gray-400">
                     <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5 text-[#ccff00]" /> {workout.duration} min</span>
-                    <span className="flex items-center gap-1"><Flame className="h-3.5 w-3.5 text-orange-400" /> {workout.calories} kcal</span>
+                    <span className="flex items-center gap-1"><Flame className="h-3.5 w-3.5 text-orange-400" /> {workout.caloriesBurned ?? workout.calories} kcal</span>
                     <span>⭐ {workout.rating || "4.8"}</span>
                   </div>
                 </div>
